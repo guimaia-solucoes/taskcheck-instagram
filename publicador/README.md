@@ -70,7 +70,9 @@ ao usuário do sistema.
 ## Uso no dia a dia
 
 - **Ver o que vai sair:** `node publicador/publicar.mjs --dry-run`
-- **Mudar a data de início:** `node publicador/gerar-agenda.mjs AAAA-MM-DD`, commit e push.
+- **Mudar a data de início:** `node publicador/gerar-agenda.mjs AAAA-MM-DD [manha|tarde] [primeiro-post]`,
+  commit e push. Ex.: `node publicador/gerar-agenda.mjs 2026-10-19 tarde 41` agenda do post 41
+  em diante, começando às 18h30 de 19/10.
 - **Mudar um horário específico:** edite `agenda.json` (formato `2026-10-20T09:00:00-03:00`).
 - **Pular um post:** adicione o número dele em `publicados.json`, ex. `"7": {"pulado": true}`.
 - **Pausar tudo:** Actions → Publicar no Instagram → `...` → **Disable workflow**.
