@@ -9,7 +9,7 @@
  *   IG_USER_ID        ID da conta profissional do Instagram
  *   META_TOKEN        token de acesso (System User ou Página) com instagram_content_publish
  *   IMAGEM_BASE_URL   URL pública da pasta publicador/jpg (sem barra no final)
- *   GRAPH_VERSION     opcional, padrão v23.0
+ *   GRAPH_VERSION     opcional, padrão v26.0
  *
  * Uso:
  *   node publicador/publicar.mjs                 publica o próximo post vencido
@@ -35,7 +35,7 @@ const agoraArg = args.find((a) => a.startsWith('--agora='));
 const agora = agoraArg ? new Date(agoraArg.slice(8)) : new Date();
 
 const { IG_USER_ID, META_TOKEN, IMAGEM_BASE_URL } = process.env;
-const GRAPH = `https://graph.facebook.com/${process.env.GRAPH_VERSION || 'v23.0'}`;
+const GRAPH = `https://graph.facebook.com/${process.env.GRAPH_VERSION || 'v26.0'}`;
 
 // ─────────────────────────── Graph API ───────────────────────────
 
