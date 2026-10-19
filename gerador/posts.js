@@ -1,13 +1,15 @@
-// Conteúdo dos 60 posts de feed do Taskcheck.
+// Conteúdo dos posts de feed do Taskcheck. Ciclo 1 (posts 1..60) aqui; ciclo 2 (61..120) em posts-ciclo2.js.
 // Campos:
-//   n        número sequencial do post (1..60)
-//   dia      dia do calendário (1..30)
+//   n        número sequencial do post
+//   dia      dia do calendário
 //   slot     'manha' | 'tarde'
 //   tpl      template visual usado no render
 //   tema     pilar de conteúdo (para relatório e calendário)
 //   ...      campos específicos de cada template
 //   legenda  texto da legenda do Instagram
 //   tags     conjunto de hashtags (chave em HASHTAGS)
+
+import ciclo2 from './posts-ciclo2.js';
 
 export const HASHTAGS = {
   os: '#ordemdeservico #gestaodeequipes #assistenciatecnica #manutencao #taskcheck #gestaodeservicos #equipeemcampo #fieldservice #softwaredegestao #os',
@@ -18,7 +20,7 @@ export const HASHTAGS = {
 
 const SITE = 'taskcheck.app';
 
-export const posts = [
+const ciclo1 = [
   // ───────────────────────── DIA 1 ─────────────────────────
   {
     n: 1, dia: 1, slot: 'manha', tpl: 'frase', tema: 'Posicionamento',
@@ -1075,5 +1077,7 @@ Sua equipe está em campo. Sua gestão também deveria estar.`,
     tags: 'os',
   },
 ];
+
+export const posts = [...ciclo1, ...ciclo2];
 
 export default posts;

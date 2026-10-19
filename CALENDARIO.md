@@ -1,6 +1,6 @@
-# Calendário de publicação — 30 dias
+# Calendário de publicação
 
-Sugestão de horários: **manhã 09h00** e **tarde 18h30** (dias úteis).
+Ordem sugerida dos posts. As datas e horários reais da publicação automática estão em `publicador/agenda.json`.
 
 | Dia | Horário | Post | Tema | Formato | Arte |
 |---|---|---|---|---|---|
@@ -64,3 +64,63 @@ Sugestão de horários: **manhã 09h00** e **tarde 18h30** (dias úteis).
 | 29 | 18h30 | 58 | Prova | depoimento | `58-mesmo-sem-internet-conseguimos-atender-em-galp.png` |
 | 30 | 09h00 | 59 | Antes x Depois | vs | `59-o-que-muda-quando-a-operacao-organiza.png` |
 | 30 | 18h30 | 60 | Conversão | cta | `60-vamos-ver-isso-na-sua-operacao.png` |
+| 31 | 09h00 | 61 | Posicionamento | frase | `61-organizar-a-operacao-nao-e-luxo-e-margem.png` |
+| 31 | 18h30 | 62 | Produto | feature | `62-o-dia-do-tecnico-comeca-com-um-resumo.png` |
+| 32 | 09h00 | 63 | Antes x Depois | vs | `63-os-de-papel-x-os-digital.png` |
+| 32 | 18h30 | 64 | Segmento | segmento | `64-eletrica.png` |
+| 33 | 09h00 | 65 | Dor | pergunta | `65-por-que-esse-cliente-chamou-de-novo.png` |
+| 33 | 18h30 | 66 | Educacional | dica | `66-meca-a-reincidencia-antes-que-o-cliente-reclam.png` |
+| 34 | 09h00 | 67 | Recurso | checklist | `67-inspecao-de-quadro-eletrico.png` |
+| 34 | 18h30 | 68 | Recurso | feature | `68-chamado-urgente-veja-quem-esta-mais-perto.png` |
+| 35 | 09h00 | 69 | Prova | numero | `69-e-a-previsao-do-tecnico-mais-proximo-na-tela.png` |
+| 35 | 18h30 | 70 | Objeção | mito | `70-sistema-de-os-e-so-para-empresa-grande.png` |
+| 36 | 09h00 | 71 | Segmento | segmento | `71-hidraulica.png` |
+| 36 | 18h30 | 72 | Produto | print | `72-saiu-para-o-atendimento-o-status-muda.png` |
+| 37 | 09h00 | 73 | Produto | jornada | `73-como-sua-operacao-entra-no-taskcheck.png` |
+| 37 | 18h30 | 74 | Recurso | feature | `74-aguardando-peca-nao-pode-ser-um-limbo.png` |
+| 38 | 09h00 | 75 | Educacional | dica | `75-defina-o-sla-por-tipo-de-chamado.png` |
+| 38 | 18h30 | 76 | Produto | lista | `76-numeros-que-voce-passa-a-ter.png` |
+| 39 | 09h00 | 77 | Segmento | segmento | `77-telecom.png` |
+| 39 | 18h30 | 78 | Antes x Depois | vs | `78-comissao-fechada-sem-planilha.png` |
+| 40 | 09h00 | 79 | Recurso | feature | `79-comissao-sem-planilha-e-sem-discussao.png` |
+| 40 | 18h30 | 80 | Dor | pergunta | `80-quanto-cada-tecnico-produziu-este-mes.png` |
+| 41 | 09h00 | 81 | Posicionamento | frase | `81-informacao-que-fica-no-celular-do-tecnico-vai-.png` |
+| 41 | 18h30 | 82 | Recurso | feature | `82-visita-improdutiva-tambem-precisa-de-prova.png` |
+| 42 | 09h00 | 83 | Recurso | checklist | `83-comissionamento-de-sistema-fotovoltaico.png` |
+| 42 | 18h30 | 84 | Educacional | dica | `84-organize-o-historico-por-equipamento.png` |
+| 43 | 09h00 | 85 | Segmento | segmento | `85-industria.png` |
+| 43 | 18h30 | 86 | Produto | print | `86-antes-durante-e-depois.png` |
+| 44 | 09h00 | 87 | Prova | numero | `87-que-toda-os-do-taskcheck-ja-traz-registradas.png` |
+| 44 | 18h30 | 88 | Antes x Depois | vs | `88-relatorio-no-word-x-pdf-automatico.png` |
+| 45 | 09h00 | 89 | Recurso | feature | `89-preventiva-que-nao-depende-de-lembrete.png` |
+| 45 | 18h30 | 90 | Objeção | mito | `90-offline-e-so-para-area-rural.png` |
+| 46 | 09h00 | 91 | Segmento | segmento | `91-seguranca-eletronica.png` |
+| 46 | 18h30 | 92 | Recurso | feature | `92-trabalho-no-app-whatsapp-pessoal-fica-para-a-f.png` |
+| 47 | 09h00 | 93 | Diferencial | jornada | `93-o-que-acontece-quando-o-sinal-cai.png` |
+| 47 | 18h30 | 94 | Educacional | dica | `94-despesa-lancada-no-dia-nao-na-sexta-feira.png` |
+| 48 | 09h00 | 95 | Dor | pergunta | `95-seu-tecnico-ainda-volta-ao-escritorio-para-ent.png` |
+| 48 | 18h30 | 96 | Recurso | feature | `96-material-lancado-no-atendimento-certo.png` |
+| 49 | 09h00 | 97 | Posicionamento | frase | `97-o-cliente-nao-compra-so-o-servico-compra-a-cer.png` |
+| 49 | 18h30 | 98 | Produto | lista | `98-o-que-o-seu-cliente-acompanha-pelo-celular.png` |
+| 50 | 09h00 | 99 | Recurso | checklist | `99-instalacao-de-cftv.png` |
+| 50 | 18h30 | 100 | Segmento | segmento | `100-manutencao-preventiva-e-corretiva.png` |
+| 51 | 09h00 | 101 | Prova | numero | `101-de-trabalho-administrativo-redigitando-e-confe.png` |
+| 51 | 18h30 | 102 | Antes x Depois | vs | `102-apagar-incendio-ou-decidir.png` |
+| 52 | 09h00 | 103 | Produto | feature | `103-os-atendimentos-do-dia-no-mapa-do-tecnico.png` |
+| 52 | 18h30 | 104 | Educacional | dica | `104-comece-pequeno-mas-comece.png` |
+| 53 | 09h00 | 105 | Dor | pergunta | `105-se-o-seu-melhor-tecnico-sair-amanha-o-conhecim.png` |
+| 53 | 18h30 | 106 | Produto | print | `106-tudo-o-que-o-tecnico-precisa-em-um-menu.png` |
+| 54 | 09h00 | 107 | Recurso | feature | `107-peca-passou-de-um-tecnico-para-outro-fica-rast.png` |
+| 54 | 18h30 | 108 | Objeção | mito | `108-localizacao-e-desconfianca-do-tecnico.png` |
+| 55 | 09h00 | 109 | Produto | jornada | `109-do-chamado-urgente-ao-atendimento.png` |
+| 55 | 18h30 | 110 | Posicionamento | frase | `110-a-melhor-ligacao-e-a-que-ninguem-precisa-fazer.png` |
+| 56 | 09h00 | 111 | Recurso | feature | `111-o-cliente-tambem-pode-assinar-pelo-celular-del.png` |
+| 56 | 18h30 | 112 | Educacional | dica | `112-revise-as-ocorrencias-da-semana.png` |
+| 57 | 09h00 | 113 | Antes x Depois | vs | `113-o-primeiro-mes-do-tecnico-novo.png` |
+| 57 | 18h30 | 114 | Prova | numero | `114-do-campo-ate-o-financeiro.png` |
+| 58 | 09h00 | 115 | Recurso | feature | `115-o-que-aconteceu-minuto-a-minuto.png` |
+| 58 | 18h30 | 116 | Recurso | checklist | `116-atendimento-de-vazamento.png` |
+| 59 | 09h00 | 117 | Educacional | dica | `117-foto-obrigatoria-mas-com-criterio.png` |
+| 59 | 18h30 | 118 | Produto | lista | `118-tudo-o-que-o-tecnico-faz-pelo-aplicativo.png` |
+| 60 | 09h00 | 119 | Posicionamento | frase | `119-organizar-nao-e-trabalhar-mais-e-parar-de-faze.png` |
+| 60 | 18h30 | 120 | Conversão | cta | `120-quer-ver-o-taskcheck-rodando-na-sua-operacao.png` |

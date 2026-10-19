@@ -12,7 +12,7 @@ $codec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Obj
 $params = New-Object System.Drawing.Imaging.EncoderParameters 1
 $params.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter ([System.Drawing.Imaging.Encoder]::Quality, [long]92)
 
-Get-ChildItem $origem -Filter '*.png' | Where-Object { $_.Name -match '^(\d{2})-' } | ForEach-Object {
+Get-ChildItem $origem -Filter '*.png' | Where-Object { $_.Name -match '^(\d+)-' } | ForEach-Object {
   $numero = $Matches[1]
   $png = [System.Drawing.Image]::FromFile($_.FullName)
   # Fundo branco para eliminar qualquer transparência

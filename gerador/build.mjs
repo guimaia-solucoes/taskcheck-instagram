@@ -512,8 +512,8 @@ if (!filtro.length) {
   }
   fs.writeFileSync(path.join(RAIZ, 'LEGENDAS.md'), legendas.join('\n'), 'utf8');
 
-  const cal = ['# Calendário de publicação — 30 dias', '',
-    'Sugestão de horários: **manhã 09h00** e **tarde 18h30** (dias úteis).', '',
+  const cal = ['# Calendário de publicação', '',
+    'Ordem sugerida dos posts. As datas e horários reais da publicação automática estão em `publicador/agenda.json`.', '',
     '| Dia | Horário | Post | Tema | Formato | Arte |', '|---|---|---|---|---|---|'];
   for (const p of posts) {
     cal.push(`| ${p.dia} | ${p.slot === 'manha' ? '09h00' : '18h30'} | ${String(p.n).padStart(2, '0')} | ${p.tema} | ${p.tpl} | \`${String(p.n).padStart(2, '0')}-${slug(p.titulo || p.pergunta || p.quote || p.mito)}.png\` |`);
