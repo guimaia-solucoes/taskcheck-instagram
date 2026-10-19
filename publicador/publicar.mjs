@@ -82,8 +82,8 @@ function legendaDe(p) {
 
 // ─────────────────────────── principal ───────────────────────────
 
-function exigirAmbiente() {
-  const faltando = ['IG_USER_ID', 'META_TOKEN', 'IMAGEM_BASE_URL'].filter((k) => !process.env[k]);
+function exigirAmbiente(chaves = ['IG_USER_ID', 'META_TOKEN', 'IMAGEM_BASE_URL']) {
+  const faltando = chaves.filter((k) => !process.env[k]);
   if (faltando.length) {
     console.error(`Variáveis de ambiente ausentes: ${faltando.join(', ')}`);
     process.exit(1);
@@ -92,7 +92,7 @@ function exigirAmbiente() {
 
 async function main() {
   if (verificar) {
-    exigirAmbiente();
+    exigirAmbiente(['IG_USER_ID', 'META_TOKEN']);
     const conta = await graph('GET', IG_USER_ID, { fields: 'username,media_count' });
     const limite = await graph('GET', `${IG_USER_ID}/content_publishing_limit`, { fields: 'quota_usage,config' });
     console.log(`Conta @${conta.username} (${conta.media_count} posts). Uso nas últimas 24h:`, limite.data?.[0]);
