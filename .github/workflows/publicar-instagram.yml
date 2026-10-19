@@ -1,0 +1,47 @@
+name: Publicar no Instagram
+
+on:
+  schedule:
+    # A cada 30 minutos (UTC). O script só publica o que já venceu na agenda.
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Apenas simular (não publica)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: publicar-instagram
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Publicar próximo post vencido
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          IMAGEM_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/publicador/jpg
+        run: node publicador/publicar.mjs ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Registrar publicação
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add publicador/publicados.json 2>/dev/null || exit 0
+          git diff --cached --quiet && exit 0
+          git commit -m "Registra post publicado no Instagram"
+          git push
