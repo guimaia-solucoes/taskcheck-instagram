@@ -68,6 +68,26 @@ ao usuário do sistema.
 4. Aba **Actions → Publicar no Instagram → Run workflow** com "Apenas simular" marcado:
    o log mostra o post que sairia. Depois rode sem simular (ou espere o próximo horário).
 
+### 5. Gatilho externo de horário (cron-job.org)
+
+O agendamento nativo do GitHub (`schedule`) não é confiável: em repositórios novos ele pode
+ficar horas sem rodar. Por isso o horário é disparado de fora, pelo cron-job.org, chamando a
+API do GitHub. O `schedule` do workflow continua como reforço.
+
+1. **Token do GitHub:** github.com → foto → **Settings → Developer settings → Personal access
+   tokens → Fine-grained tokens → Generate new token**. Repository access: só
+   `taskcheck-instagram`. Permissions → Repository → **Actions: Read and write**. Validade: 1 ano.
+2. **cron-job.org:** crie uma conta grátis e um cronjob para cada horário (08:15, 13:30, 19:25),
+   fuso **America/Sao_Paulo**:
+   - URL: `https://api.github.com/repos/guimaia-solucoes/taskcheck-instagram/actions/workflows/publicar-instagram.yml/dispatches`
+   - Aba **Advanced**: método **POST**; headers `Authorization: Bearer SEU_TOKEN`,
+     `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28`;
+     corpo `{"ref":"main"}`.
+   - Resposta esperada: **204**.
+
+Disparar mais de uma vez não duplica post: o script só publica o que está vencido e ainda não
+consta em `publicados.json`.
+
 ## Uso no dia a dia
 
 - **Ver o que vai sair:** `node publicador/publicar.mjs --dry-run`
