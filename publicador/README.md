@@ -9,15 +9,16 @@ Publica os 60 posts nos horários do calendário usando a API oficial da Meta
 - `jpg/` — artes em JPEG (a API do Instagram não aceita PNG), geradas por `converter-jpg.ps1`.
 - `publicar.mjs` — a cada execução, publica **um** post: o mais antigo cujo horário já passou
   e que ainda não está em `publicados.json`.
-- `.github/workflows/publicar-instagram.yml` — roda o script a cada 30 minutos e grava
+- `.github/workflows/publicar-instagram.yml` — roda o script a cada 15 minutos (e às 08h15, 13h30 e 19h25) e grava
   `publicados.json` no repositório depois de cada publicação.
 
 O Instagram busca a imagem por URL pública, por isso o repositório no GitHub precisa ser
 **público** (as artes vão ser públicas no Instagram de qualquer forma). O token fica nos
 *secrets* do GitHub e nunca aparece no código.
 
-Como o GitHub roda o agendamento a cada 30 min (e às vezes com alguns minutos de atraso),
-o post das 09h00 sai entre 09h00 e ~09h40.
+Os horários são 08h15, 13h30 e 19h25 (Brasília), definidos em `HORARIOS` no `gerar-agenda.mjs`.
+O agendamento do GitHub às vezes atrasa alguns minutos, então cada post sai entre o horário
+marcado e ~15 min depois.
 
 ## Configuração (uma vez só)
 
@@ -70,9 +71,9 @@ ao usuário do sistema.
 ## Uso no dia a dia
 
 - **Ver o que vai sair:** `node publicador/publicar.mjs --dry-run`
-- **Mudar a data de início:** `node publicador/gerar-agenda.mjs AAAA-MM-DD [manha|tarde] [primeiro-post]`,
-  commit e push. Ex.: `node publicador/gerar-agenda.mjs 2026-10-19 tarde 41` agenda do post 41
-  em diante, começando às 18h30 de 19/10.
+- **Refazer a agenda:** `node publicador/gerar-agenda.mjs AAAA-MM-DD [HH:MM] [primeiro-post] [--primeiro-agora]`,
+  commit e push. Ex.: `node publicador/gerar-agenda.mjs 2026-10-19 19:25 41 --primeiro-agora` publica o
+  post 41 na próxima execução e segue do 42 em diante a partir das 19h25 de 19/10.
 - **Mudar um horário específico:** edite `agenda.json` (formato `2026-10-20T09:00:00-03:00`).
 - **Pular um post:** adicione o número dele em `publicados.json`, ex. `"7": {"pulado": true}`.
 - **Pausar tudo:** Actions → Publicar no Instagram → `...` → **Disable workflow**.

@@ -2,8 +2,9 @@ name: Publicar no Instagram
 
 on:
   schedule:
-    # A cada 30 minutos (UTC). O script só publica o que já venceu na agenda.
-    - cron: '*/30 * * * *'
+    # Nos minutos dos horários da agenda (08h15, 13h30, 19h25) e a cada 15 min como reforço.
+    # O script só publica o que já venceu na agenda.
+    - cron: '0,15,25,30,45 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:

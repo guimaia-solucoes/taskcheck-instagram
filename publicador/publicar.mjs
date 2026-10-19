@@ -1,7 +1,7 @@
 /**
  * Publica no Instagram o próximo post vencido da agenda, via Instagram Graph API.
  *
- * Feito para rodar periodicamente (GitHub Actions a cada 30 min). A cada execução
+ * Feito para rodar periodicamente (GitHub Actions a cada 15 min). A cada execução
  * publica no máximo um post: o mais antigo cujo horário já passou e que ainda não
  * está em publicados.json. Se uma execução falhar, a seguinte tenta de novo.
  *
