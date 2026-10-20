@@ -1,14 +1,24 @@
 name: Publicar no Instagram
 
+# Relógio que se reagenda sozinho: cada execução dorme até o horário do próximo post da agenda
+# (no máximo 5h30, limite de um job do GitHub), publica e dispara a execução seguinte.
+# O agendamento nativo do GitHub atrasa horas em repositórios novos, por isso ele fica só como
+# reforço para religar o relógio caso a corrente seja interrompida.
+
 on:
+  # Um push que muda a agenda ou o relógio também liga a corrente.
+  push:
+    branches: [main]
+    paths:
+      - 'publicador/agenda.json'
+      - 'publicador/esperar.mjs'
+      - '.github/workflows/publicar-instagram.yml'
   schedule:
-    # Nos minutos dos horários da agenda (08h15, 13h30, 19h25) e a cada 15 min como reforço.
-    # O script só publica o que já venceu na agenda.
-    - cron: '0,15,25,30,45 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Apenas simular (não publica)'
+        description: 'Apenas simular (não publica nem reagenda)'
         type: boolean
         default: false
 
@@ -18,11 +28,17 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   publicar:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 355
+    env:
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      META_TOKEN: ${{ secrets.META_TOKEN }}
+      IMAGEM_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/publicador/jpg
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
 
@@ -30,15 +46,35 @@ jobs:
         with:
           node-version: 24
 
-      - name: Publicar próximo post vencido
-        env:
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          META_TOKEN: ${{ secrets.META_TOKEN }}
-          IMAGEM_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/publicador/jpg
-        run: node publicador/publicar.mjs ${{ inputs.dry_run && '--dry-run' || '' }}
+      - name: Simular
+        if: ${{ inputs.dry_run }}
+        run: node publicador/publicar.mjs --dry-run
+
+      - name: Aguardar o horário do próximo post
+        id: espera
+        if: ${{ !inputs.dry_run }}
+        run: |
+          espera=$(node publicador/esperar.mjs)
+          echo "Segundos até o próximo post: $espera"
+          if [ "$espera" -lt 0 ]; then echo "acao=fim" >> "$GITHUB_OUTPUT"; exit 0; fi
+          limite=19800
+          if [ "$espera" -gt "$limite" ]; then
+            echo "Próximo post está longe; dormindo ${limite}s e reagendando."
+            sleep "$limite"
+            echo "acao=reagendar" >> "$GITHUB_OUTPUT"
+          else
+            sleep "$espera"
+            echo "acao=publicar" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publicar
+        if: ${{ steps.espera.outputs.acao == 'publicar' }}
+        run: |
+          git pull --quiet --rebase
+          node publicador/publicar.mjs
 
       - name: Registrar publicação
-        if: always()
+        if: ${{ always() && steps.espera.outputs.acao == 'publicar' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -46,3 +82,7 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "Registra post publicado no Instagram"
           git push
+
+      - name: Disparar a próxima execução
+        if: ${{ always() && (steps.espera.outputs.acao == 'publicar' || steps.espera.outputs.acao == 'reagendar') }}
+        run: gh workflow run publicar-instagram.yml --ref "${{ github.ref_name }}" --repo "${{ github.repository }}"
