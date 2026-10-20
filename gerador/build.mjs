@@ -12,7 +12,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { posts, HASHTAGS } from './posts.js';
 
@@ -23,8 +23,8 @@ const TMP = path.join(__dirname, 'tmp');
 const PRINTS = path.resolve(RAIZ, '..', 'Site', 'assets', 'img', 'app');
 const LOGO = path.resolve(RAIZ, '..', 'Site', 'assets', 'img', 'logo.svg');
 
-const W = 1080;
-const H = 1350;
+export const W = 1080;
+export const H = 1350;
 
 // ─────────────────────────── assets ───────────────────────────
 
@@ -50,7 +50,7 @@ const ARROW = `<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h13M12.5 5.5L1
 
 const esc = (s = '') => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const nl = (s = '') => esc(s).replace(/\n/g, '<br>');
-const slug = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+export const slug = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 46);
 
 // ─────────────────────────── CSS ───────────────────────────
@@ -284,6 +284,16 @@ h1 em{font-style:normal;color:#0f918f}
 .cta-box .wa{margin-left:auto;width:76px;height:76px;border-radius:50%;background:#fff;color:#0f918f;
   display:flex;align-items:center;justify-content:center}
 .cta-box .wa svg{width:38px;height:38px}
+
+/* carrossel: contador de página e dica de arrastar */
+.pagina{position:absolute;top:84px;right:84px;z-index:4;padding:13px 22px;border-radius:999px;
+  border:2px solid #e6eaf3;background:#fff;font-size:23px;font-weight:800;color:#5b6479;letter-spacing:.04em}
+.dark .pagina{border-color:rgba(255,255,255,.18);background:transparent;color:#aeb5c5}
+.brand .arraste{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:24px;font-weight:800;color:#0f918f}
+.dark .brand .arraste{color:#5fd3bd}
+.brand .arraste svg{width:30px;height:30px}
+/* com celular sangrando no rodapé, a dica fica ao lado do logo para não passar por baixo do aparelho */
+.bleed .brand .arraste{margin-left:40px}
 `;
 
 // ─────────────────────────── helpers de markup ───────────────────────────
@@ -293,10 +303,13 @@ const bullets = (itens = [], cls = '') => `<ul class="bullets ${cls}">${itens
   .map((i) => `<li><span class="ic">${CHECK}</span><span>${esc(i)}</span></li>`).join('')}</ul>`;
 const phone = (nome) => `<div class="phone"><img src="${print(nome)}" alt=""></div>`;
 
-function brand(dark, cta = 'taskcheck.app') {
+function brand(dark, arraste, bleed, cta = 'taskcheck.app') {
+  // Com celular sangrando no rodapé não cabe site + dica de arrastar: fica só a dica.
+  const site = arraste && bleed ? '' : `<span class="sep"></span><span>${esc(cta)}</span>`;
   return `<footer class="brand">
     <img src="${logoUri(dark)}" alt="Taskcheck">
-    <span class="sep"></span><span>${esc(cta)}</span>
+    ${site}
+    ${arraste ? `<span class="arraste">Arraste ${ARROW}</span>` : ''}
   </footer>`;
 }
 
@@ -426,7 +439,7 @@ const T = {
 
 // ─────────────────────────── página ───────────────────────────
 
-function html(p) {
+export function html(p) {
   const dark = !!p.dark || p.tpl === 'frase' || p.tpl === 'depoimento';
   const corpo = T[p.tpl](p);
   const bleed = !!p.print && (p.tpl === 'feature' || p.tpl === 'print');
@@ -439,14 +452,15 @@ function html(p) {
   <div class="mesh"><i class="a"></i><i class="b"></i></div>
   <div class="grid-lines"></div>
   ${p.tpl === 'frase' || p.tpl === 'numero' ? `<div class="marca-dagua">${CHECK}</div>` : ''}
+  ${p.pagina ? `<div class="pagina">${esc(p.pagina)}</div>` : ''}
   <div class="content">${corpo}</div>
-  ${brand(dark)}
+  ${brand(dark, p.arraste, bleed)}
 </div></body></html>`;
 }
 
 // ─────────────────────────── chrome ───────────────────────────
 
-function acharChrome() {
+export function acharChrome() {
   const candidatos = [
     'C:/Program Files/Google/Chrome/Application/chrome.exe',
     'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
@@ -458,7 +472,7 @@ function acharChrome() {
   return achado;
 }
 
-function capturar(chrome, arquivoHtml, arquivoPng) {
+export function capturar(chrome, arquivoHtml, arquivoPng) {
   execFileSync(chrome, [
     '--headless=new',
     '--disable-gpu',
@@ -476,49 +490,53 @@ function capturar(chrome, arquivoHtml, arquivoPng) {
 
 // ─────────────────────────── execução ───────────────────────────
 
-const args = process.argv.slice(2);
-const soHtml = args.includes('--html');
-const filtro = args.filter((a) => /^\d+$/.test(a)).map(Number);
-const lista = filtro.length ? posts.filter((p) => filtro.includes(p.n)) : posts;
+// Só executa quando chamado direto (o gerador de carrosséis importa este módulo).
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
-fs.mkdirSync(SAIDA, { recursive: true });
-fs.mkdirSync(TMP, { recursive: true });
-const chrome = soHtml ? null : acharChrome();
+  const args = process.argv.slice(2);
+  const soHtml = args.includes('--html');
+  const filtro = args.filter((a) => /^\d+$/.test(a)).map(Number);
+  const lista = filtro.length ? posts.filter((p) => filtro.includes(p.n)) : posts;
 
-let ok = 0;
-for (const p of lista) {
-  const base = `${String(p.n).padStart(2, '0')}-${slug(p.titulo || p.pergunta || p.quote || p.mito)}`;
-  const fHtml = path.join(TMP, `${base}.html`);
-  const fPng = path.join(SAIDA, `${base}.png`);
-  fs.writeFileSync(fHtml, html(p), 'utf8');
-  if (!soHtml) {
-    capturar(chrome, fHtml, fPng);
-    if (!fs.existsSync(fPng)) throw new Error(`Falha ao capturar o post ${p.n}`);
+  fs.mkdirSync(SAIDA, { recursive: true });
+  fs.mkdirSync(TMP, { recursive: true });
+  const chrome = soHtml ? null : acharChrome();
+
+  let ok = 0;
+  for (const p of lista) {
+    const base = `${String(p.n).padStart(2, '0')}-${slug(p.titulo || p.pergunta || p.quote || p.mito)}`;
+    const fHtml = path.join(TMP, `${base}.html`);
+    const fPng = path.join(SAIDA, `${base}.png`);
+    fs.writeFileSync(fHtml, html(p), 'utf8');
+    if (!soHtml) {
+      capturar(chrome, fHtml, fPng);
+      if (!fs.existsSync(fPng)) throw new Error(`Falha ao capturar o post ${p.n}`);
+    }
+    ok++;
+    process.stdout.write(`\r${ok}/${lista.length} — ${base}                              `);
   }
-  ok++;
-  process.stdout.write(`\r${ok}/${lista.length} — ${base}                              `);
+  process.stdout.write('\n');
+
+  // ─────────────── legendas e calendário ───────────────
+
+  if (!filtro.length) {
+    const legendas = ['# Legendas dos posts — Taskcheck', '',
+      'Copie a legenda junto com o bloco de hashtags do post correspondente.', ''];
+    for (const p of posts) {
+      legendas.push(`---`, ``, `## Post ${String(p.n).padStart(2, '0')} — Dia ${p.dia} (${p.slot === 'manha' ? 'manhã' : 'tarde'}) · ${p.tema}`, '',
+        `**Arte:** \`${String(p.n).padStart(2, '0')}-${slug(p.titulo || p.pergunta || p.quote || p.mito)}.png\``, '',
+        p.legenda, '', HASHTAGS[p.tags], '');
+    }
+    fs.writeFileSync(path.join(RAIZ, 'LEGENDAS.md'), legendas.join('\n'), 'utf8');
+
+    const cal = ['# Calendário de publicação', '',
+      'Ordem sugerida dos posts. As datas e horários reais da publicação automática estão em `publicador/agenda.json`.', '',
+      '| Dia | Horário | Post | Tema | Formato | Arte |', '|---|---|---|---|---|---|'];
+    for (const p of posts) {
+      cal.push(`| ${p.dia} | ${p.slot === 'manha' ? '09h00' : '18h30'} | ${String(p.n).padStart(2, '0')} | ${p.tema} | ${p.tpl} | \`${String(p.n).padStart(2, '0')}-${slug(p.titulo || p.pergunta || p.quote || p.mito)}.png\` |`);
+    }
+    fs.writeFileSync(path.join(RAIZ, 'CALENDARIO.md'), cal.join('\n'), 'utf8');
+  }
+
+  console.log(`Pronto: ${ok} arte(s) em ${SAIDA}`);
 }
-process.stdout.write('\n');
-
-// ─────────────── legendas e calendário ───────────────
-
-if (!filtro.length) {
-  const legendas = ['# Legendas dos posts — Taskcheck', '',
-    'Copie a legenda junto com o bloco de hashtags do post correspondente.', ''];
-  for (const p of posts) {
-    legendas.push(`---`, ``, `## Post ${String(p.n).padStart(2, '0')} — Dia ${p.dia} (${p.slot === 'manha' ? 'manhã' : 'tarde'}) · ${p.tema}`, '',
-      `**Arte:** \`${String(p.n).padStart(2, '0')}-${slug(p.titulo || p.pergunta || p.quote || p.mito)}.png\``, '',
-      p.legenda, '', HASHTAGS[p.tags], '');
-  }
-  fs.writeFileSync(path.join(RAIZ, 'LEGENDAS.md'), legendas.join('\n'), 'utf8');
-
-  const cal = ['# Calendário de publicação', '',
-    'Ordem sugerida dos posts. As datas e horários reais da publicação automática estão em `publicador/agenda.json`.', '',
-    '| Dia | Horário | Post | Tema | Formato | Arte |', '|---|---|---|---|---|---|'];
-  for (const p of posts) {
-    cal.push(`| ${p.dia} | ${p.slot === 'manha' ? '09h00' : '18h30'} | ${String(p.n).padStart(2, '0')} | ${p.tema} | ${p.tpl} | \`${String(p.n).padStart(2, '0')}-${slug(p.titulo || p.pergunta || p.quote || p.mito)}.png\` |`);
-  }
-  fs.writeFileSync(path.join(RAIZ, 'CALENDARIO.md'), cal.join('\n'), 'utf8');
-}
-
-console.log(`Pronto: ${ok} arte(s) em ${SAIDA}`);
