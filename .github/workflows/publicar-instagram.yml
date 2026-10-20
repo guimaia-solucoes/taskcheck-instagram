@@ -68,6 +68,7 @@ jobs:
           fi
 
       - name: Publicar
+        id: publicar
         if: ${{ steps.espera.outputs.acao == 'publicar' }}
         run: |
           git pull --quiet --rebase
@@ -83,6 +84,8 @@ jobs:
           git commit -m "Registra post publicado no Instagram"
           git push
 
+      # Só continua a corrente se a publicação deu certo. Em caso de falha (token, bloqueio da
+      # Meta etc.) a corrente para e o agendamento de reforço tenta de novo mais tarde, sem loop.
       - name: Disparar a próxima execução
-        if: ${{ always() && (steps.espera.outputs.acao == 'publicar' || steps.espera.outputs.acao == 'reagendar') }}
+        if: ${{ always() && (steps.espera.outputs.acao == 'reagendar' || (steps.espera.outputs.acao == 'publicar' && steps.publicar.outcome == 'success')) }}
         run: gh workflow run publicar-instagram.yml --ref "${{ github.ref_name }}" --repo "${{ github.repository }}"
