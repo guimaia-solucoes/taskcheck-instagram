@@ -2,8 +2,8 @@ name: Publicar no Instagram
 
 # Relógio que se reagenda sozinho: cada execução dorme até o horário do próximo post da agenda
 # (no máximo 5h30, limite de um job do GitHub), publica e dispara a execução seguinte.
-# O agendamento nativo do GitHub atrasa horas em repositórios novos, por isso ele fica só como
-# reforço para religar o relógio caso a corrente seja interrompida.
+# Sem agendamento de reforço: se a corrente parar (falha ou bloqueio da Meta), ela só volta com um
+# push na agenda/relógio ou um disparo manual. Para pausar tudo, crie o arquivo publicador/PAUSADO.
 
 on:
   # Um push que muda a agenda ou o relógio também liga a corrente.
@@ -12,9 +12,8 @@ on:
     paths:
       - 'publicador/agenda.json'
       - 'publicador/esperar.mjs'
+      - 'publicador/PAUSADO'
       - '.github/workflows/publicar-instagram.yml'
-  schedule:
-    - cron: '*/30 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -85,7 +84,7 @@ jobs:
           git push
 
       # Só continua a corrente se a publicação deu certo. Em caso de falha (token, bloqueio da
-      # Meta etc.) a corrente para e o agendamento de reforço tenta de novo mais tarde, sem loop.
+      # Meta etc.) a corrente para e só volta com push ou disparo manual, sem insistir na API.
       - name: Disparar a próxima execução
         if: ${{ always() && (steps.espera.outputs.acao == 'reagendar' || (steps.espera.outputs.acao == 'publicar' && steps.publicar.outcome == 'success')) }}
         run: gh workflow run publicar-instagram.yml --ref "${{ github.ref_name }}" --repo "${{ github.repository }}"

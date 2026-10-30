@@ -34,6 +34,12 @@ const verificar = args.includes('--verificar');
 const agoraArg = args.find((a) => a.startsWith('--agora='));
 const agora = agoraArg ? new Date(agoraArg.slice(8)) : new Date();
 
+// Trava manual: enquanto publicador/PAUSADO existir, nada é publicado (ex.: conta suspensa).
+if (fs.existsSync(path.join(__dirname, 'PAUSADO')) && !dryRun && !verificar) {
+  console.log('Publicação pausada (publicador/PAUSADO existe). Nada foi publicado.');
+  process.exit(0);
+}
+
 const { IG_USER_ID, META_TOKEN, IMAGEM_BASE_URL } = process.env;
 const GRAPH = `https://graph.facebook.com/${process.env.GRAPH_VERSION || 'v26.0'}`;
 

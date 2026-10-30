@@ -29,7 +29,8 @@ const proximo = agenda
   .map((a) => new Date(a.quando).getTime())
   .sort((a, b) => a - b)[0];
 
-if (proximo === undefined) {
+// Trava manual: com publicador/PAUSADO a corrente encerra como se a agenda tivesse acabado.
+if (proximo === undefined || fs.existsSync(path.join(__dirname, 'PAUSADO'))) {
   console.log(-1);
 } else {
   const ultima = Math.max(0, ...Object.values(publicados).map((p) => (p.publicado ? new Date(p.publicado).getTime() : 0)));
