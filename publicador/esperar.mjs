@@ -15,7 +15,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const INTERVALO_MINIMO = 20 * 60 * 1000;
+// Mesmo com a agenda atrasada (ex.: depois de uma pausa), nunca publica dois posts com menos
+// de 10 h entre eles.
+const INTERVALO_MINIMO = 10 * 60 * 60 * 1000;
 
 const agoraArg = process.argv.find((a) => a.startsWith('--agora='));
 const agora = agoraArg ? new Date(agoraArg.slice(8)).getTime() : Date.now();

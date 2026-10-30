@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { posts, HASHTAGS } from './posts.js';
+import { posts, hashtagsDe } from './posts.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(__dirname, '..');
@@ -525,7 +525,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     for (const p of posts) {
       legendas.push(`---`, ``, `## Post ${String(p.n).padStart(2, '0')} — Dia ${p.dia} (${p.slot === 'manha' ? 'manhã' : 'tarde'}) · ${p.tema}`, '',
         `**Arte:** \`${String(p.n).padStart(2, '0')}-${slug(p.titulo || p.pergunta || p.quote || p.mito)}.png\``, '',
-        p.legenda, '', HASHTAGS[p.tags], '');
+        p.legenda, '', hashtagsDe(p), '');
     }
     fs.writeFileSync(path.join(RAIZ, 'LEGENDAS.md'), legendas.join('\n'), 'utf8');
 

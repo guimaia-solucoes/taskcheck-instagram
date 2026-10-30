@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { html, acharChrome, capturar } from './build.mjs';
-import { HASHTAGS } from './posts.js';
+import { hashtagsDe } from './posts.js';
 import { carrosseis } from './carrosseis.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -51,7 +51,7 @@ for (const c of lista) {
     process.stdout.write(`\rCarrossel ${c.id} — slide ${i + 1}/${total}          `);
   });
 
-  fs.writeFileSync(path.join(pasta, 'legenda.txt'), `${c.legenda}\n\n${HASHTAGS[c.tags]}\n`, 'utf8');
+  fs.writeFileSync(path.join(pasta, 'legenda.txt'), `${c.legenda}\n\n${hashtagsDe(c)}\n`, 'utf8');
   process.stdout.write('\n');
 }
 

@@ -11,12 +11,22 @@
 
 import ciclo2 from './posts-ciclo2.js';
 
+// Banco de hashtags por tema. Cada post usa só #taskcheck + 3 delas, em rodízio (ver hashtagsDe):
+// repetir o mesmo bloco grande em todo post é um dos sinais de spam do Instagram.
 export const HASHTAGS = {
-  os: '#ordemdeservico #gestaodeequipes #assistenciatecnica #manutencao #taskcheck #gestaodeservicos #equipeemcampo #fieldservice #softwaredegestao #os',
-  campo: '#equipeemcampo #tecnicoemcampo #gestaodecampo #ordemdeservico #manutencaopredial #climatizacao #pmoc #taskcheck #produtividade #gestao',
-  gestao: '#gestaoempresarial #processos #produtividade #gestaodeservicos #ordemdeservico #indicadores #taskcheck #transformacaodigital #eficiencia #pme',
-  tec: '#appparatecnicos #ordemdeservico #offlinefirst #checklistdigital #taskcheck #tecnicoemcampo #manutencao #assistenciatecnica #gestao #tecnologia',
+  os: '#ordemdeservico #gestaodeequipes #assistenciatecnica #manutencao #gestaodeservicos #equipeemcampo #fieldservice #softwaredegestao #controledeservicos #empresadeservicos #atendimentotecnico #manutencaocorretiva #os',
+  campo: '#equipeemcampo #tecnicoemcampo #gestaodecampo #ordemdeservico #manutencaopredial #climatizacao #pmoc #produtividade #arcondicionado #refrigeracao #manutencaopreventiva #instaladores #gestao',
+  gestao: '#gestaoempresarial #processos #produtividade #gestaodeservicos #ordemdeservico #indicadores #transformacaodigital #eficiencia #pme #empreendedorismo #gestaodeprocessos #pequenasempresas #lucratividade',
+  tec: '#appparatecnicos #ordemdeservico #offlinefirst #checklistdigital #tecnicoemcampo #manutencao #assistenciatecnica #gestao #tecnologia #aplicativo #digitalizacao #automacao #saas',
 };
+
+// Hashtags de um post: #taskcheck + 3 do tema, escolhidas pelo número do post para que posts
+// seguidos do mesmo tema não repitam o mesmo conjunto (e o resultado seja sempre o mesmo).
+export function hashtagsDe(p) {
+  const banco = HASHTAGS[p.tags].split(' ');
+  const n = p.n || 0;
+  return ['#taskcheck', ...[0, 1, 2].map((i) => banco[(n * 3 + i) % banco.length])].join(' ');
+}
 
 const SITE = 'taskcheck.app';
 

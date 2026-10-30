@@ -21,7 +21,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { posts, HASHTAGS } from '../gerador/posts.js';
+import { posts, hashtagsDe } from '../gerador/posts.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const AGENDA = path.join(__dirname, 'agenda.json');
@@ -79,7 +79,7 @@ async function publicar(imageUrl, caption) {
 // ─────────────────────────── legenda ───────────────────────────
 
 function legendaDe(p) {
-  const texto = `${p.legenda.trim()}\n\n${HASHTAGS[p.tags]}`;
+  const texto = `${p.legenda.trim()}\n\n${hashtagsDe(p)}`;
   const hashtags = texto.match(/#[\p{L}\p{N}_]+/gu) || [];
   if (texto.length > 2200) throw new Error(`Post ${p.n}: legenda com ${texto.length} caracteres (máx. 2200)`);
   if (hashtags.length > 30) throw new Error(`Post ${p.n}: ${hashtags.length} hashtags (máx. 30)`);

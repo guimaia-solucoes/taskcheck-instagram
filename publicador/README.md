@@ -1,6 +1,6 @@
 # Publicação automática no Instagram
 
-Publica os 60 posts nos horários do calendário usando a API oficial da Meta
+Publica os posts do calendário usando a API oficial da Meta
 (Instagram Graph API), rodando no GitHub Actions. Não depende do PC ligado.
 
 ## Como funciona
@@ -9,16 +9,18 @@ Publica os 60 posts nos horários do calendário usando a API oficial da Meta
 - `jpg/` — artes em JPEG (a API do Instagram não aceita PNG), geradas por `converter-jpg.ps1`.
 - `publicar.mjs` — a cada execução, publica **um** post: o mais antigo cujo horário já passou
   e que ainda não está em `publicados.json`.
-- `.github/workflows/publicar-instagram.yml` — roda o script a cada 15 minutos (e às 08h15, 13h30 e 19h25) e grava
-  `publicados.json` no repositório depois de cada publicação.
+- `.github/workflows/publicar-instagram.yml` — dorme até o horário do próximo post, publica, grava
+  `publicados.json` no repositório e dispara a execução seguinte.
 
 O Instagram busca a imagem por URL pública, por isso o repositório no GitHub precisa ser
 **público** (as artes vão ser públicas no Instagram de qualquer forma). O token fica nos
 *secrets* do GitHub e nunca aparece no código.
 
-Os horários são 08h15, 13h30 e 19h25 (Brasília), definidos em `HORARIOS` no `gerar-agenda.mjs`.
-O agendamento do GitHub às vezes atrasa alguns minutos, então cada post sai entre o horário
-marcado e ~15 min depois.
+Sai **um post por dia**. O horário alterna entre manhã, almoço e fim de tarde (`JANELAS` no
+`gerar-agenda.mjs`) com variação de até ±35 min, e nunca saem dois posts com menos de 10 h de
+intervalo (`esperar.mjs`). Cada legenda leva `#taskcheck` + 3 hashtags do tema em rodízio
+(`hashtagsDe` em `gerador/posts.js`). Ritmo alto, horário exato e o mesmo bloco de hashtags em
+todo post levaram à suspensão da conta em 30/10/2026.
 
 ## Configuração (uma vez só)
 
@@ -91,12 +93,12 @@ consta em `publicados.json`.
 ## Uso no dia a dia
 
 - **Ver o que vai sair:** `node publicador/publicar.mjs --dry-run`
-- **Refazer a agenda:** `node publicador/gerar-agenda.mjs AAAA-MM-DD [HH:MM] [primeiro-post] [--primeiro-agora]`,
-  commit e push. Ex.: `node publicador/gerar-agenda.mjs 2026-10-19 19:25 41 --primeiro-agora` publica o
-  post 41 na próxima execução e segue do 42 em diante a partir das 19h25 de 19/10.
+- **Refazer a agenda:** `node publicador/gerar-agenda.mjs AAAA-MM-DD [primeiro-post]`, commit e push.
+  Sem o número, começa no primeiro post ainda não publicado.
 - **Mudar um horário específico:** edite `agenda.json` (formato `2026-10-20T09:00:00-03:00`).
 - **Pular um post:** adicione o número dele em `publicados.json`, ex. `"7": {"pulado": true}`.
-- **Pausar tudo:** Actions → Publicar no Instagram → `...` → **Disable workflow**.
+- **Pausar tudo:** crie `publicador/PAUSADO` e faça push. Para retomar, gere a agenda a partir
+  de uma data futura, apague `PAUSADO`, commit e push.
 - **Arte ou legenda alterada:** rode `node gerador/build.mjs N`, depois
   `powershell -ExecutionPolicy Bypass -File publicador\converter-jpg.ps1`, commit e push.
 

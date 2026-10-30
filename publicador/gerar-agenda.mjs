@@ -1,17 +1,17 @@
 /**
- * Gera publicador/agenda.json distribuindo os posts em horários consecutivos
- * (horário de Brasília, UTC-3), usando os horários diários de HORARIOS.
+ * Gera publicador/agenda.json com UM post por dia (horário de Brasília, UTC-3).
+ *
+ * Para não parecer automação, o horário muda a cada dia: alterna entre as janelas de
+ * JANELAS e soma uma variação de até ±VARIACAO minutos. A variação é calculada a partir do
+ * número do post, então gerar a agenda de novo dá sempre os mesmos horários.
  *
  * Uso:
- *   node publicador/gerar-agenda.mjs AAAA-MM-DD [HH:MM] [primeiro-post] [--primeiro-agora]
+ *   node publicador/gerar-agenda.mjs AAAA-MM-DD [primeiro-post]
  *
- *   AAAA-MM-DD        dia do primeiro horário
- *   HH:MM             primeiro horário (um dos HORARIOS); padrão: o primeiro do dia
- *   primeiro-post     número do primeiro post da fila; padrão 1
- *   --primeiro-agora  o primeiro post sai na próxima execução do workflow e os
- *                     demais começam no horário informado
+ *   AAAA-MM-DD        dia do primeiro post
+ *   primeiro-post     número do primeiro post da fila; padrão: o primeiro ainda não publicado
  *
- * Exemplo: node publicador/gerar-agenda.mjs 2026-10-19 19:25 41 --primeiro-agora
+ * Exemplo: node publicador/gerar-agenda.mjs 2026-11-10 73
  *
  * Posts anteriores ao informado não entram na agenda. Editar agenda.json à mão também funciona.
  */
@@ -22,28 +22,34 @@ import { fileURLToPath } from 'node:url';
 import { posts } from '../gerador/posts.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const HORARIOS = ['08:15', '13:30', '19:25'];
+const JANELAS = ['08:40', '12:20', '18:50'];
+const VARIACAO = 35;
 
-const args = process.argv.slice(2);
-const primeiroAgora = args.includes('--primeiro-agora');
-const [inicio, horarioInicial = HORARIOS[0], aPartir = '1'] = args.filter((a) => !a.startsWith('--'));
-if (!/^\d{4}-\d{2}-\d{2}$/.test(inicio || '') || !HORARIOS.includes(horarioInicial)) {
-  console.error(`Uso: node publicador/gerar-agenda.mjs AAAA-MM-DD [${HORARIOS.join('|')}] [primeiro-post] [--primeiro-agora]`);
+const arqPublicados = path.join(__dirname, 'publicados.json');
+const publicados = fs.existsSync(arqPublicados) ? JSON.parse(fs.readFileSync(arqPublicados, 'utf8')) : {};
+const primeiroPendente = posts.map((p) => p.n).filter((n) => !publicados[n]).sort((a, b) => a - b)[0];
+
+const [inicio, aPartir = String(primeiroPendente)] = process.argv.slice(2);
+if (!/^\d{4}-\d{2}-\d{2}$/.test(inicio || '')) {
+  console.error('Uso: node publicador/gerar-agenda.mjs AAAA-MM-DD [primeiro-post]');
   process.exit(1);
 }
 
-const fila = posts.filter((p) => p.n >= Number(aPartir)).sort((a, b) => a.n - b.n);
-const base = new Date(`${inicio}T00:00:00Z`);
-let indice = HORARIOS.indexOf(horarioInicial);
+// Variação em minutos, entre -VARIACAO e +VARIACAO, sempre igual para o mesmo post.
+function variacao(n) {
+  const x = Math.sin(n * 12.9898) * 43758.5453;
+  return Math.round((x - Math.floor(x)) * 2 * VARIACAO) - VARIACAO;
+}
 
-const agenda = fila.map((p, i) => {
-  // Meia-noite do dia de início já passou: o workflow publica na primeira execução.
-  if (primeiroAgora && i === 0) return { n: p.n, quando: `${inicio}T00:00:00-03:00` };
-  const d = new Date(base);
-  d.setUTCDate(d.getUTCDate() + Math.floor(indice / HORARIOS.length));
-  const hora = HORARIOS[indice % HORARIOS.length];
-  indice++;
-  return { n: p.n, quando: `${d.toISOString().slice(0, 10)}T${hora}:00-03:00` };
+const fila = posts.filter((p) => p.n >= Number(aPartir)).sort((a, b) => a.n - b.n);
+const base = new Date(`${inicio}T00:00:00-03:00`).getTime();
+
+const agenda = fila.map((p, dia) => {
+  const [h, m] = JANELAS[dia % JANELAS.length].split(':').map(Number);
+  const minutos = h * 60 + m + variacao(p.n);
+  // Desloca para UTC-3 para formatar a hora local de Brasília.
+  const local = new Date(base + (dia * 1440 + minutos) * 60000 - 3 * 3600000).toISOString();
+  return { n: p.n, quando: `${local.slice(0, 16)}:00-03:00` };
 });
 
 fs.writeFileSync(path.join(__dirname, 'agenda.json'), JSON.stringify(agenda, null, 2) + '\n', 'utf8');
